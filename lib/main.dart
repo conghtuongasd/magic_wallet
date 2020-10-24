@@ -1,9 +1,15 @@
-import 'package:etherwallet/app_config.dart';
-import 'package:etherwallet/router.dart';
-import 'package:etherwallet/services_provider.dart';
+import 'package:etherwallet/config.dart';
+import 'package:etherwallet/features/wallet/domain/bloc/wallet_bloc.dart';
+import 'package:etherwallet/router_map.dart';
+import 'package:etherwallet/services/address_service.dart';
+import 'package:etherwallet/services/configuration_service.dart';
+import 'package:etherwallet/services/contract_service.dart';
+import 'package:etherwallet/services/services_locator.dart';
 import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 
 void main() async {
   // bootstrapping;
@@ -20,27 +26,36 @@ class MainApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return new MaterialApp(
-      title: 'Flutter App',
-      initialRoute: '/',
-      routes: getRoutes(context),
-      navigatorObservers: [
-        FirebaseAnalyticsObserver(analytics: analytics),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<WalletBloc>(
+            create: (BuildContext context) => WalletBloc(
+                GetIt.instance<AddressService>(),
+                GetIt.instance<ConfigurationService>(),
+                GetIt.instance<ContractService>()))
       ],
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-        buttonTheme: ButtonThemeData(
-          buttonColor: Colors.blue,
-          textTheme: ButtonTextTheme.primary,
+      child: MaterialApp(
+        title: 'Flutter App',
+        initialRoute: '/',
+        routes: getRouterMap(context),
+        navigatorObservers: [
+          FirebaseAnalyticsObserver(analytics: analytics),
+        ],
+        theme: ThemeData(
+          // This is the theme of your application.
+          //
+          // Try running your application with "flutter run". You'll see the
+          // application has a blue toolbar. Then, without quitting the app, try
+          // changing the primarySwatch below to Colors.green and then invoke
+          // "hot reload" (press "r" in the console where you ran "flutter run",
+          // or simply save your changes to "hot reload" in a Flutter IDE).
+          // Notice that the counter didn't reset back to zero; the application
+          // is not restarted.
+          primarySwatch: Colors.blue,
+          buttonTheme: ButtonThemeData(
+            buttonColor: Colors.blue,
+            textTheme: ButtonTextTheme.primary,
+          ),
         ),
       ),
     );
